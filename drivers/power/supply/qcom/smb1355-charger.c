@@ -31,6 +31,10 @@
 #include <linux/pmic-voter.h>
 #include <linux/string.h>
 
+#ifdef CONFIG_FORCE_FAST_CHARGE
+#include <linux/fastchg.h>
+#endif
+
 /* SMB1355 registers, different than mentioned in smb-reg.h */
 
 #define REVID_BASE	0x0100
@@ -349,13 +353,15 @@ static int smb1355_set_charge_param(struct smb1355 *chip,
 {
 	int rc;
 	u8 val_raw;
-
+#ifdef CONFIG_FORCE_FAST_CHARGE
+	if ((force_fast_charge > 0 && ((val_u > 9000000 && param->max_u == 5000000) || (val_u > param->max_u && param->max_u != 5000000))) || (force_fast_charge < 1 && (val_u > param->max_u || val_u < param->min_u))){
+#else
 	if (val_u > param->max_u || val_u < param->min_u) {
+#endif
 		pr_err("%s: %d is out of range [%d, %d]\n",
 			param->name, val_u, param->min_u, param->max_u);
 		return -EINVAL;
 	}
-
 	val_raw = (val_u - param->min_u) / param->step_u;
 
 	rc = smb1355_write(chip, param->reg, val_raw);
@@ -364,7 +370,6 @@ static int smb1355_set_charge_param(struct smb1355 *chip,
 			param->name, val_raw, param->reg, rc);
 		return rc;
 	}
-
 	return rc;
 }
 
