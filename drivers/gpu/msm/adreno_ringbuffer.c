@@ -1,5 +1,4 @@
-/* Copyright (c) 2002,2007-2018,2019 The Linux Foundation. All rights reserved.
- * Copyright (C) 2020 XiaoMi, Inc.
+/* Copyright (c) 2002,2007-2019, The Linux Foundation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -322,7 +321,7 @@ int adreno_ringbuffer_probe(struct adreno_device *adreno_dev, bool nopreempt)
 
 	if (!adreno_is_a3xx(adreno_dev)) {
 		status = kgsl_allocate_global(device, &device->scratch,
-				PAGE_SIZE, 0, 0, "scratch");
+				PAGE_SIZE, 0, KGSL_MEMDESC_RANDOM, "scratch");
 		if (status != 0)
 			return status;
 	}
