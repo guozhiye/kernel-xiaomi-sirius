@@ -1784,12 +1784,13 @@ static ssize_t cpuset_write_resmask_wrapper(struct kernfs_open_file *of,
 	};
 	struct c_data c_targets[6] = {
 		/* Silver only cpusets go first */
-		{ "background",			"0-1"},
-		{ "camera-daemon",		"0-3"},
-		{ "system-background",		"0-3"},
-		{ "restricted",			"0-3"},
+		{ "audio-app",			"0-5"},
+		{ "background",			"0-5"},
+		{ "camera-daemon",		"0-7"},
+		{ "system-background",		"0-5"},
+		{ "restricted",			"0-5"},
 		{ "top-app",			"0-7"},
-		{ "foreground",			"0-3,6-7"}};
+		{ "foreground",			"0-5"}};
 
 	if (!strcmp(current->comm, "init")) {
 		for (i = 0; i < ARRAY_SIZE(c_targets); i++) {
