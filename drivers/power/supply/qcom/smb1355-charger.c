@@ -196,7 +196,6 @@ struct smb_params {
 	struct smb_chg_param	fcc;
 	struct smb_chg_param	ov;
 	struct smb_chg_param	usb_icl;
-	struct smb_chg_param	usb_icl_fast;
 };
 
 static struct smb_params v1_params = {
@@ -219,13 +218,6 @@ static struct smb_params v1_params = {
 		.reg    = USBIN_CURRENT_LIMIT_CFG_REG,
 		.min_u  = 100000,
 		.max_u  = 5000000,
-		.step_u = 30000,
-	},
-	.usb_icl_fast	= {
-		.name   = "usb input current limit fast charge",
-		.reg    = USBIN_CURRENT_LIMIT_CFG_REG,
-		.min_u  = 100000,
-		.max_u  = 9000000,
 		.step_u = 30000,
 	},
 };
@@ -361,7 +353,11 @@ static int smb1355_set_charge_param(struct smb1355 *chip,
 {
 	int rc;
 	u8 val_raw;
+#ifdef CONFIG_FORCE_FAST_CHARGE
+	if ((force_fast_charge > 0 && ((val_u > 9000000 && param->max_u == 5000000) || (val_u > param->max_u && param->max_u != 5000000))) || (force_fast_charge < 1 && (val_u > param->max_u || val_u < param->min_u))){
+#else
 	if (val_u > param->max_u || val_u < param->min_u) {
+#endif
 		pr_err("%s: %d is out of range [%d, %d]\n",
 			param->name, val_u, param->min_u, param->max_u);
 		return -EINVAL;
@@ -778,14 +774,8 @@ static int smb1355_parallel_get_prop(struct power_supply *psy,
 		break;
 	case POWER_SUPPLY_PROP_CURRENT_MAX:
 		if (IS_USBIN(chip->dt.pl_mode))
-#ifdef CONFIG_FORCE_FAST_CHARGE
-			rc = force_fast_charge ? smb1355_get_charge_param(chip,
-					&chip->param.usb_icl_fast, &val->intval) : smb1355_get_charge_param(chip,
-					&chip->param.usb_icl, &val->intval);
-#else
 			rc = smb1355_get_charge_param(chip,
 					&chip->param.usb_icl, &val->intval);
-#endif
 		else
 			val->intval = 0;
 		break;
@@ -879,14 +869,9 @@ static int smb1355_set_current_max(struct smb1355 *chip, int curr)
 		rc = smb1355_set_parallel_charging(chip, false);
 		if (rc < 0)
 			return rc;
-#ifdef CONFIG_FORCE_FAST_CHARGE
-			rc = force_fast_charge ? smb1355_set_charge_param(chip,
-				&chip->param.usb_icl_fast, curr) : smb1355_set_charge_param(chip,
+
+		rc = smb1355_set_charge_param(chip,
 				&chip->param.usb_icl, curr);
-#else
-			rc = smb1355_set_charge_param(chip,
-				&chip->param.usb_icl, curr);
-#endif
 	}
 
 	return rc;
