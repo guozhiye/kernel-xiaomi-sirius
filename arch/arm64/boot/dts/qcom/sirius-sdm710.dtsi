@@ -182,7 +182,7 @@
 	qcom,panel-supply-entries = <&dsi_amoled_panel_pwr_supply>;
 	qcom,mdss-dsi-bl-pmic-control-type = "bl_ctrl_dcs";
 	qcom,mdss-dsi-bl-min-level = <1>;
-	qcom,mdss-dsi-bl-max-level = <1023>;
+	qcom,mdss-dsi-bl-max-level = <4095>;
 	qcom,platform-reset-gpio = <&tlmm 75 0>;
 	qcom,platform-te-gpio = <&tlmm 10 0>;
 };
@@ -423,8 +423,8 @@
 	qcom,fg-cutoff-voltage = <3400>;
 	qcom,fg-empty-voltage = <3100>;
 	qcom,fg-cutoff-current = <200>;
-	qcom,fg-jeita-hyst-temp = <2>;
-	qcom,fg-jeita-thresholds = <0 15 45 60>;
+	qcom,fg-jeita-hyst-temp = <1>;
+	qcom,fg-jeita-thresholds = <0 15 46 60>;
 	qcom,fg-esr-clamp-mohms = <60>;
 	qcom,fg-batt-temp-delta = <6>;
 	qcom,slope-limit-temp-threshold = <100>;
